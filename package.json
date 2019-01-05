@@ -1,0 +1,19 @@
+{
+  "name": "mernstack",
+  "version": "1.0.0",
+  "description": "learning the MERN stack flow",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iyykee01/mernstack.git"
+  },
+  "author": "iyykee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iyykee01/mernstack/issues"
+  },
+  "homepage": "https://github.com/iyykee01/mernstack#readme"
+}
