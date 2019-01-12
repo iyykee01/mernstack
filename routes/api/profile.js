@@ -9,12 +9,16 @@ const Profile = require("../../models/Profile");
 //User Model import
 const User = require("../../models/User");
 
+// input validation import
+const validatProfileInput = require("../../validations/profile");
+
 //@route GET api/profile/
 //@desc Get current user profile
 //access Private
 router.get("/", passport.authenticate("jwt", { session: false }), (req, res) => {
   const errors = {};
   Profile.findOne({ user: req.user.id })
+    .populate("user", ["name", "avatar"])
     .then(profile => {
       if (!profile) {
         errors.noProfile = "There's no profile";
@@ -27,11 +31,71 @@ router.get("/", passport.authenticate("jwt", { session: false }), (req, res) => 
     });
 });
 
+//@route GET api/profile/handle/:handle
+//@desc GET profile by handle
+//access public
+router.get("/handle/:handle", (req, res) => {
+  Profile.findOne({ handle: req.params.handle })
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.noProfile = "There's no profile";
+        return res.status(404).json(errors);
+      }
+      res.json(profile);
+    })
+    .catch(err => {
+      res.status(404).json({ handleError: "No users found with such handle" });
+    });
+});
+
+//@route GET api/profile/user/:user_id
+//@desc GET profile by user id
+//access public
+router.get("/user/:user_id", (req, res) => {
+  Profile.findOne({ user: req.params.user_id })
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.noProfile = "There's no profile";
+        return res.status(404).json(errors);
+      }
+      res.json(profile);
+    })
+    .catch(err => {
+      res.status(404).json({ idError: "No users found with such id" });
+    });
+});
+
+//@route GET api/profile/all
+//@desc GET all profile
+//access public
+router.get("/all", (req, res) => {
+  Profile.find()
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.noProfile = "There's no profile";
+        return res.status(404).json(errors);
+      }
+      res.json(profile);
+    })
+    .catch(err => {
+      res.status(404).json({ idError: "No Profiles " });
+    });
+});
+
 //@route Post api/profile/
 //@desc Create or Edit user profile
 //access Private
 router.post("/", passport.authenticate("jwt", { session: false }), (req, res) => {
-  const errors = {};
+  //validation here
+  const { errors, isValid } = validatProfileInput(req.body);
+  if (!isValid) {
+    //return errors with status = 400
+    return res.status(400).json(errors);
+  }
+
   const profileFields = {};
   profileFields.user = req.user.id;
   if (req.body.handle) profileFields.handle = req.body.handle;
@@ -78,7 +142,7 @@ router.post("/", passport.authenticate("jwt", { session: false }), (req, res) =>
             return res.josn(profile);
           })
           .catch(err => {
-            error.saveProfile = "No profile could be save " + err;
+            errors.saveProfile = "No profile could be save " + err;
           });
       });
     }
