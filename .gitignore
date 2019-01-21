@@ -30,6 +30,7 @@ build/Release
 node_modules
 jspm_packages
 package-lock.json
+/node_modules
 
 # Optional npm cache directory
 .npm
