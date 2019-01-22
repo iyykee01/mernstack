@@ -82,7 +82,7 @@ router.get("/all", (req, res) => {
       res.json(profile);
     })
     .catch(err => {
-      res.status(404).json({ idError: "No Profiles " });
+      res.status(404).json(err);
     });
 });
 
